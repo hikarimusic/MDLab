@@ -1,0 +1,7 @@
+moderngl
+numpy
+pygame
+PyGLM
+pywavefront
+torch
+scipy
