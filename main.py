@@ -70,6 +70,17 @@ class GraphicsEngine:
             self.render()
             self.delta_time = self.clock.tick(60)
 
+            if self.capture:
+                for t in self.capture:
+                    if abs(self.scene.simulate.time-t) < 0.01:
+                        self.screenshot(str(round(self.scene.simulate.time, 1))+".jpg")
+    
+    def screenshot(self, img):
+        buffer = self.ctx.screen.read(components=3)
+        image = pg.image.fromstring(buffer, self.WIN_SIZE, "RGB")
+        flipped_image = pg.transform.flip(image, False, True)
+        pg.image.save(flipped_image, img)
+
 
 if __name__ == '__main__':
     app = GraphicsEngine()

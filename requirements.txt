@@ -1,7 +1,9 @@
-moderngl
-numpy
-pygame
-PyGLM
-pywavefront
-torch
+moderngl == 5.8.2
+numpy == 1.24.4
+pygame == 2.5.1
+PyGLM == 2.7.0
+pywavefront == 1.3.3
+torch == 2.0.1
 scipy
+pandas
+seaborn

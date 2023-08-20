@@ -4,10 +4,14 @@ from random import random, randint
 import numpy as np
 from scipy.stats import uniform, maxwell
 import torch
+import pandas as pd
+import seaborn as sns
+import time
 
 class Simulate:
     def __init__(self):
-        self.device = 'cuda:0'
+        # self.device = 'cuda:0'
+        self.device = 'cpu'
         self.initial()
     
     def initial(self):
@@ -16,7 +20,7 @@ class Simulate:
         T = 1e-12
         Q = 1.60e-19
         # H2O
-        self.n = 1000
+        self.n = 10
         self.n1 = self.n // 2
         self.n2 = self.n - self.n1
         self.m = 18
@@ -33,7 +37,7 @@ class Simulate:
 
         self.dp = 1.84*3.33e-30 / (Q*L)
         K = 8.99e9 * ((T**2)*(Q**2))/(M*(L**3))
-        self.e2 = K*self.dp*self.dp * (1/2)
+        self.e2 = K*self.dp*self.dp
 
         qi = [uniform.rvs(loc=-1, scale=2, size=self.n) * self.L,
               uniform.rvs(loc=-1, scale=2, size=self.n) * self.L,
@@ -48,9 +52,13 @@ class Simulate:
         self.rp = torch.tensor(np.transpose(pi), device=self.device)
 
         self.time = 0.
-        self.clip = 100
+        self.clip = 50
+
+        self.data = []
 
     def step(self):
+        if self.time<0.01:
+            self.start_time = time.time()
         print('Time:', round(self.time, 1), 'ps          ', end='\r')
         self.time += self.S
         n, L, S, clip = self.n, self.L, self.S, self.clip
@@ -67,6 +75,22 @@ class Simulate:
             self.qi.grad.zero_()
         if self.pi.grad!=None:
             self.pi.grad.zero_()
+        
+        # for i in range(self.n1):
+        #     self.data.append([self.qi[i,1].item(), round(self.time, 1), "A"])
+        # for i in range(self.n1, self.n):
+        #     self.data.append([self.qi[i,1].item(), round(self.time, 1), "B"])
+        # if abs(self.time-20) < 0.01:
+        #     df = pd.DataFrame(self.data, columns=["Position Y (nm)", "Time (ps)", "Particle"])
+        #     sns.set_theme()
+        #     plot = sns.relplot(data=df, kind="line", x="Time (ps)", y="Position Y (nm)", hue="Particle")
+        #     plot.fig.savefig("plot.jpg")
+
+
+        if abs(self.time-1) < 0.01:
+            print("")
+            print(self.device, self.n, time.time()-self.start_time)
+            print("")
 
     def hamiltonian(self):
         n, n1, m, r, L, e, e2, qi, pi = self.n, self.n1, self.m, self.r, self.L, self.e, self.e2, self.qi, self.pi   
@@ -94,6 +118,8 @@ class Scene:
         self.objects = []
         self.skybox = AdvancedSkyBox(app, tex_id='black')
         self.simulate = Simulate()
+        self.app.camera.position = glm.vec3(0, 0, 6)
+        self.app.capture = []
         self.load()
 
     def add_object(self, obj):
@@ -104,21 +130,21 @@ class Scene:
         add = self.add_object
         sim= self.simulate
 
-        self.sphere = [None for i in range(sim.n)]
-        for i in range(sim.n1):
-            self.sphere[i] = MovingSphere(app, pos=(sim.qi[i,0].item(), sim.qi[i,1].item(), sim.qi[i,2].item()), 
-                                          scale=(sim.r, sim.r, sim.r), tex_id='red')
-            add(self.sphere[i])
-        for i in range(sim.n1, sim.n):
-            self.sphere[i] = MovingSphere(app, pos=(sim.qi[i,0].item(), sim.qi[i,1].item(), sim.qi[i,2].item()), 
-                                          scale=(sim.r, sim.r, sim.r), tex_id='white')
-            add(self.sphere[i])
+        # self.sphere = [None for i in range(sim.n)]
+        # for i in range(sim.n1):
+        #     self.sphere[i] = MovingSphere(app, pos=(sim.qi[i,0].item(), sim.qi[i,1].item(), sim.qi[i,2].item()), 
+        #                                   scale=(sim.r, sim.r, sim.r), tex_id='red')
+        #     add(self.sphere[i])
+        # for i in range(sim.n1, sim.n):
+        #     self.sphere[i] = MovingSphere(app, pos=(sim.qi[i,0].item(), sim.qi[i,1].item(), sim.qi[i,2].item()), 
+        #                                   scale=(sim.r, sim.r, sim.r), tex_id='white')
+        #     add(self.sphere[i])
         
-        # add(Cat(app, pos=(5, 0, 5), scale=(.1, .1, .1)))
+        add(Cat(app, pos=(5, 0, 5), scale=(.1, .1, .1)))
 
     def update(self):
         sim = self.simulate
         for i in range(1):
             sim.step()
-        for i in range(sim.n):
-            self.sphere[i].pos = (sim.qi[i,0].item(), sim.qi[i,1].item(), sim.qi[i,2].item())
+        # for i in range(sim.n):
+        #     self.sphere[i].pos = (sim.qi[i,0].item(), sim.qi[i,1].item(), sim.qi[i,2].item())

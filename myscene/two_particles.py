@@ -33,7 +33,7 @@ class Simulate:
 
         self.dp = 1.84*3.33e-30 / (Q*L)
         K = 8.99e9 * ((T**2)*(Q**2))/(M*(L**3))
-        self.e2 = K*self.dp*self.dp * (1/2)
+        self.e2 = K*self.dp*self.dp
 
         qi = [uniform.rvs(loc=-1, scale=2, size=self.n) * self.L,
               uniform.rvs(loc=-1, scale=2, size=self.n) * self.L,
@@ -48,7 +48,7 @@ class Simulate:
         self.rp = torch.tensor(np.transpose(pi), device=self.device)
 
         self.time = 0.
-        self.clip = 100
+        self.clip = 50
 
     def step(self):
         print('Time:', round(self.time, 1), 'ps          ', end='\r')
