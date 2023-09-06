@@ -69,11 +69,6 @@ class GraphicsEngine:
             self.camera.update()
             self.render()
             self.delta_time = self.clock.tick(60)
-
-            if self.capture:
-                for t in self.capture:
-                    if abs(self.scene.simulate.time-t) < 0.01:
-                        self.screenshot(str(round(self.scene.simulate.time, 1))+".jpg")
     
     def screenshot(self, img):
         buffer = self.ctx.screen.read(components=3)
