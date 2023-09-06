@@ -7,3 +7,6 @@ torch == 2.0.1
 scipy
 pandas
 seaborn
+scikit-image
+plotly
+nbformat
