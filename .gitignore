@@ -133,3 +133,4 @@ dmypy.json
 # MDLab
 *.npy
 *.npz
+*.png
