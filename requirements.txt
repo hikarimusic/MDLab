@@ -11,3 +11,5 @@ scikit-image
 plotly
 nbformat
 kaleido
+nglview
+py3Dmol
